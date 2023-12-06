@@ -1,0 +1,160 @@
+@model IEnumerable<vwEmployeeReligion>
+
+@{
+    ViewData["Title"] = "Employee Form";
+}
+
+<div class="container">
+@await Html.PartialAsync("~/Views/Employee/ContentPanels/_Form.cshtml", new MstEmployee(), ViewData)
+@await Html.PartialAsync("~/Views/Employee/ContentPanels/_Grid.cshtml", Model, ViewData)
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function() {
+            $("#btnReligionLookup").on("click", function(e) {
+                openReligionLookup();
+            });
+            $("#btnCancel").on("click", function(e) {
+                resetForm();
+            });
+            $("#btnEdit").on("click", function() {
+                if(!validateEdit()) return false;
+                populateEmployee();
+                setModeEdit();
+            });
+            $("#btnDelete").on("click", function() {
+                if(!validateDelete()) return false;
+                deleteEmployee();
+            });
+            $("#btnSubmit").on("click", function() {
+                if(!validateSubmit()) return false;
+                setModeAdd();
+            });
+            $("#btnReligionClosed").on("click", function() {
+                var obj = $("input[name='religion_radio']:checked").data();
+                if (obj !== undefined) {
+                    $("#ReligionName").val(obj.name);
+                    $("#ReligionCode").val(obj.code);
+                }
+            });
+            $("#emp_checkbox_all").on("change", function(e) {
+                var isChecked = e.target.checked;
+                setCheckboxEmployee(isChecked);
+            });
+        });
+
+        function setCheckboxEmployee(isChecked) {
+            $("input[name='emp_checkbox']").prop("checked",isChecked);
+        };
+
+        function setModeEdit() {
+            $("#divOverlay").addClass("overlay");
+            $("#btnSubmit").val("Update");
+        };
+
+        function setModeAdd() {
+            $("#divOverlay").removeClass("overlay");
+            $("#btnSubmit").val("Submit");
+        }
+
+        function populateEmployee() {
+            var item = $("input[name='emp_checkbox']:checked").parent().parent().children();
+            var emp = { 
+                id: item.get(1).innerText,
+                name: item.get(2).innerText,
+                address: item.get(3).innerText,
+                religionCode: item.get(4).innerText,
+                religionName: item.get(5).innerText,
+            };
+            $("#Name").val(emp.name);
+            $("#Address").val(emp.address);
+            $("#ID").val(emp.id);
+            $("#ReligionCode").val(emp.religionCode);
+            $("#ReligionName").val(emp.religionName);
+        };
+
+        function validateSubmit() {
+            var errorMessage = "";
+            if($("#Name").val() == "")
+                errorMessage += "Name is required \n";
+            if($("#Address").val() == "")
+                errorMessage += "Address is required \n";
+            if($("#ReligionName").val() == "")
+                errorMessage += "Religion is required \n";
+            
+            if(errorMessage == "") return true;
+            alert("Please fill the following requirement(s): \n" + errorMessage);
+            return false;
+        }
+
+        function validateEdit() {
+            var count = $("input[name='emp_checkbox']:checked").length;
+            if (count == 0) {
+                alert("Please select the data");
+                return false;
+            } else if (count > 1) {
+                alert("You can't edit multiple data");
+                return false;
+            }
+            return true;
+        };
+
+        function validateDelete() {
+            var count = $("input[name='emp_checkbox']:checked").length;
+            if(count == 0) {
+                alert("You have to select minimal one data");
+                return false;
+            }
+            if(!confirm("Are you sure want to delete this data?")) return false;
+            return true;
+        };
+
+        function resetForm() {
+            $("#Name").val("");
+            $("#Address").val("");
+            $("#ID").val("");
+            $("#ReligionCode").val("");
+            $("#ReligionName").val("");
+
+            setModeAdd();
+            return true;
+        };
+
+        function openReligionLookup() {
+            $.ajax({
+                url: '@Url.Action("GetReligions", "Employee")',
+                type: 'GET',
+                //data: { name: name },
+                success: function (data) {
+                    $('#religionContentLookup').html(data);
+                    $('#religionLookup').modal('show');
+                },
+                error: function () {
+                    alert('Error occurred while fetching data.');
+                }
+            });
+        };
+
+        function deleteEmployee() {
+            var tempId = [];
+            $("input[name='emp_checkbox']:checked").each(function () {
+                var checkboxId = $(this).get(0).id;
+                var id = checkboxId.split("_")[2]; //emp_checkbox_#id
+                tempId.push(id);
+            });
+            if(tempId.length == 0) return false;
+            $.ajax({
+                url: '@Url.Action("DeleteEmployee", "Employee")',
+                type: 'POST',
+                data: { ids: tempId.join(",")},
+                success: function (data) {
+                    window.location.reload(); //refresh
+                },
+                error: function () {
+                    alert('Error occurred while fetching data.');
+                }
+            });
+        };
+    </script>
+}

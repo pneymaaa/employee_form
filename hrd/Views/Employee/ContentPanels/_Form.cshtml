@@ -1,0 +1,74 @@
+@model MstEmployee
+
+@* @Html.ValidationSummary("Please correct the errors")  *@
+
+@* <div asp-validation-summary="ModelOnly" class="text-danger"></div>  *@
+<form asp-action="Submit">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <h5 class="card-title">Master Data Employee Form</h5>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label asp-for="Name" class="form-label"></label>
+                    </div>                
+                    <div class="col-md-10">
+                        <input asp-for="ID" class="form-control" readonly="readonly" hidden/>
+                        <input asp-for="Name" class="form-control"/>
+                        @* <span asp-validation-for="Name" class="text-danger"></span> *@
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label asp-for="Address" class="form-label"></label>
+                    </div>                
+                    <div class="col-md-10">
+                        <textarea asp-for="Address" class="form-control"></textarea>
+                        @* <span asp-validation-for="Address" class="text-danger"></span> *@
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label asp-for="ReligionCode" class="form-label"></label>
+                    </div>                
+                    <div class="col-md-9">
+                        <input asp-for="ReligionCode" class="form-control" readonly="readonly" hidden/>
+                        <input type="text" name="ReligionName" id="ReligionName" class="form-control" readonly="readonly">
+                        @* <span asp-validation-for="ReligionCode" class="text-danger"></span> *@
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-outline-secondary" type="button" id="btnReligionLookup">...</button>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                    </div>                
+                    <div class="col-md-10">
+                       <input type="submit" class="btn btn-outline-success" value="Submit" id="btnSubmit">
+                       <button class="btn btn-outline-warning" type="button" id="btnCancel">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>      
+</form>
+
+<div class="modal fade" id="religionLookup" tabindex="-1" aria-labelledby="religionLookupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="religionLookupLabel">Search Religion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="religionContentLookup">
+                
+            </div>
+            <div class="modal-footer">
+                <button id="btnReligionClosed" type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                @* <button type="button" class="btn btn-primary">Save changes</button> *@
+            </div>
+            </div>
+        </div>
+    </div> 
